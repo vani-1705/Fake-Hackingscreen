@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ultimate Hack Sim</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: monospace;
+      background: black;
+      color: lime;
+      overflow: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .screen {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 3vw;
+      font-weight: bold;
+      animation: blink 0.5s step-end infinite;
+    }
+
+    .corner, .corner-text {
+      position: absolute;
+      font-size: 1vw;
+      color: lime;
+      z-index: 11;
+      animation: glitch 1s infinite;
+    }
+
+    .top { top: 0; left: 50%; transform: translateX(-50%); }
+    .bottom { bottom: 0; left: 50%; transform: translateX(-50%); }
+    .left { top: 50%; left: 0; transform: translateY(-50%); }
+    .right { top: 50%; right: 0; transform: translateY(-50%); }
+
+    .top-left { top: 0; left: 0; padding: 10px; }
+    .top-right { top: 0; right: 0; padding: 10px; text-align: right; }
+    .bottom-left { bottom: 0; left: 0; padding: 10px; }
+    .bottom-right { bottom: 0; right: 0; padding: 10px; text-align: right; }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    @keyframes glitch {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(1px, -1px); }
+      50% { transform: translate(-1px, 1px); }
+      75% { transform: translate(1px, 1px); }
+    }
+
+    .red-bg {
+      background: red;
+      color: white;
+      font-size: 4vw;
+      animation: blink 0.7s step-end infinite;
+    }
+  </style>
+</head>
+<body onclick="launchFullscreen()">
+
+<canvas id="matrix"></canvas>
+
+<div id="main" class="screen">LOADING...</div>
+
+<!-- Corner and side texts -->
+<div class="corner-text top" id="topText"></div>
+<div class="corner-text bottom" id="bottomText"></div>
+<div class="corner-text left" id="leftText"></div>
+<div class="corner-text right" id="rightText"></div>
+
+<div class="corner top-left" id="tl"></div>
+<div class="corner top-right" id="tr"></div>
+<div class="corner bottom-left" id="bl"></div>
+<div class="corner bottom-right" id="br"></div>
+
+<audio id="alertSound" src="/home/rgukt/Downloads/alert.mp3"></audio>
+<audio id="hackSound" src="/home/rgukt/Downloads/hack.mp3"></audio>
+
+<script>
+  // Matrix Rain
+  
+  const canvas = document.getElementById('matrix');
+  const ctx = canvas.getContext('2d');
+  canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth;
+  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+:',./-=<>";
+  const fontSize = 14;
+  const columns = canvas.width / fontSize;
+  const drops = Array.from({length: columns}).fill(1);
+
+  function drawMatrix() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#0F0";
+    ctx.font = fontSize + "px monospace";
+
+    drops.forEach((y, x) => {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(text, x * fontSize, y * fontSize);
+      if (y * fontSize > canvas.height || Math.random() > 0.975) drops[x] = 0;
+      drops[x]++;
+    });
+  }
+  setInterval(drawMatrix, 50);
+  // sound
+  
+  const alertSound = new Audio("alert.mp3");
+  const hackSound = new Audio("hack.mp3");
+  
+  // Text Stages
+  const stages = [
+    { text: "🚨 SECURITY ALERT 🚨", delay: 8000, class: "screen", sound: "alertSound" },
+    { text: "🔓 FILES UNBLOCKED", delay: 8000, class: "screen" },
+    { text: "⚠️ UNAUTHORIZED ACCESS DETECTED", delay: 8000, class: "screen" },
+    { text: "!!! SYSTEM HACKED !!!", delay: 999999, class: "screen red-bg", sound: "hackSound" }
+  ];
+
+  let current = 0;
+  const main = document.getElementById("main");
+
+  function typeWriterEffect(text, index = 0) {
+    if (index === 0) main.textContent = '';
+    if (index < text.length) {
+      main.textContent += text.charAt(index);
+      setTimeout(() => typeWriterEffect(text, index + 1), 50);
+    }
+  }
+
+  function showNextStage() {
+    if (current >= stages.length) return;
+    const stage = stages[current];
+    main.className = stage.class;
+    typeWriterEffect(stage.text);
+
+    if (stage.sound) {
+     document.getElementById(stage.sound).play();
+    }
+
+    current++;
+    setTimeout(showNextStage, stage.delay);
+  }
+
+  // Corner & Side Texts
+  const dynamicTexts = {
+    top: ["Downloading secure files...", "Vault data unlocked", "Tracing VPN...", "Syncing clocks..."],
+    bottom: ["Injecting payload...", "Bypassing firewall...", "Encrypting logs...", "Writing logs..."],
+    left: ["Exploiting port 443...", "IP: 192.168.1.100", "ARP spoof active", "Data bridge open"],
+    right: ["Remote access granted", "Session key found!", "Ping: 5ms", "Root access enabled"],
+    corners: ["🟢 CONNECTED", "📡 SIGNAL LOCK", "💾 Dumping RAM", "🔐 ROOT ACCESS", "🛑 TRACE BLOCKED", "⚡ ZERO DAY", "🔍 SCANNING", "💣 MALWARE DEPLOY"]
+  };
+
+  function rotateText(id, textArray) {
+    const el = document.getElementById(id);
+    let i = 0;
+    setInterval(() => {
+      el.innerHTML = textArray[i % textArray.length];
+      i++;
+    }, 3000);
+  }
+
+  rotateText("topText", dynamicTexts.top);
+  rotateText("bottomText", dynamicTexts.bottom);
+  rotateText("leftText", dynamicTexts.left);
+  rotateText("rightText", dynamicTexts.right);
+  rotateText("tl", dynamicTexts.corners.slice(0, 2));
+  rotateText("tr", dynamicTexts.corners.slice(2, 4));
+  rotateText("bl", dynamicTexts.corners.slice(4, 6));
+  rotateText("br", dynamicTexts.corners.slice(6, 8));
+
+  // Launch fullscreen on click
+  function launchFullscreen() {
+    const el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen();
+  }
+
+  // Start the stage sequence
+  showNextStage();
+</script>
+
+</body>
+</html>
