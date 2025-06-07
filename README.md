@@ -3,8 +3,7 @@
 
 A fun and interactive fake hacking screen simulation designed to mimic a cyberpunk-style system breach using matrix rain animation, animated warnings, dynamic terminal texts, and sound effects. Built entirely using HTML, CSS, and JavaScript.
 
-![Uploading Fakehacking.png…]()
-
+![Fakehacking](https://github.com/user-attachments/assets/c981419a-6698-4ce7-b640-3c5c4e00b130)
 
 🎯 Features
 
