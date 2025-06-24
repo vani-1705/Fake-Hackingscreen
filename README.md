@@ -1,5 +1,11 @@
 # Fake-Hackingscreen
 💻 Ultimate Hack Sim — Matrix Style Hacking Screen
+# PROJECT LOGIC:
+-In this project it shows the screen is hacked but fake.
+-It is for fun but it is not real and not harmful.
+
+# PROJECT IDEA:
+This idea came from nowadays technology so developed hackers are hacking laptops easily so for fun this shows fake hacking.
 
 A fun and interactive fake hacking screen simulation designed to mimic a cyberpunk-style system breach using matrix rain animation, animated warnings, dynamic terminal texts, and sound effects. Built entirely using HTML, CSS, and JavaScript.
 
